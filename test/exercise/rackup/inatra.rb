@@ -6,22 +6,27 @@ module Inatra
 
     def call(env)
       method_name = env["REQUEST_METHOD"].downcase + env["PATH_INFO"]
-      if @@routes[method_name].nil?
+      if methods[method_name].nil?
         not_found
       else
-        @@routes[method_name].call
+        methods[method_name].call
       end
     end
 
     private
 
-    @@routes = Hash.new
-
     def method_missing(symbol, *args, &block)
       method_name = symbol.to_s + args[0]
-      @@routes[method_name] = block
+      methods[method_name] = block
     end
 
     def not_found; [404, {}, ["Not Found"]] end
+
+    def methods
+      if @methods.nil?
+        @methods = Hash.new
+      end
+      @methods
+    end
   end
 end
